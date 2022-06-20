@@ -15,6 +15,7 @@ require (
 	github.com/n-r-w/postgres v1.0.0
 	github.com/n-r-w/sqlb v1.0.0
 	github.com/n-r-w/sqlq v1.0.0
+	github.com/n-r-w/tools v1.0.0
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858
 )
 
@@ -36,7 +37,6 @@ require (
 	github.com/jackc/pgx/v4 v4.16.1 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/lib/pq v1.10.6 // indirect
-	github.com/n-r-w/tools v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/thanhpk/randstr v1.0.4 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
