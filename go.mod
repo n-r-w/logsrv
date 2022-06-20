@@ -7,14 +7,14 @@ require (
 	github.com/gammazero/workerpool v1.1.2
 	github.com/google/wire v0.5.0
 	github.com/jackc/pgtype v1.11.0
-	github.com/n-r-w/eno v0.0.0-20220619184937-425cde54ada1
-	github.com/n-r-w/httprouter v0.0.0-20220619191741-cfcf5452ed5c
-	github.com/n-r-w/httpserver v0.0.0-20220619191657-38fa566fee47
-	github.com/n-r-w/lg v0.0.0-20220619185307-1ce2595e5af1
-	github.com/n-r-w/nerr v0.0.0-20220619190314-abe1fa00208e
-	github.com/n-r-w/postgres v0.0.0-20220619191141-99060d839332
-	github.com/n-r-w/sqlb v0.0.0-20220619191446-4e63a945cea6
-	github.com/n-r-w/sqlq v0.0.0-20220619191555-f1dbcad554a5
+	github.com/n-r-w/eno v1.0.0
+	github.com/n-r-w/httprouter v1.0.0
+	github.com/n-r-w/httpserver v1.0.0
+	github.com/n-r-w/lg v1.0.0
+	github.com/n-r-w/nerr v1.0.0
+	github.com/n-r-w/postgres v1.0.0
+	github.com/n-r-w/sqlb v1.0.0
+	github.com/n-r-w/sqlq v1.0.0
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858
 )
 
@@ -36,7 +36,7 @@ require (
 	github.com/jackc/pgx/v4 v4.16.1 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/lib/pq v1.10.6 // indirect
-	github.com/n-r-w/tools v0.0.0-20220619185834-27cdd81a54fd // indirect
+	github.com/n-r-w/tools v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/thanhpk/randstr v1.0.4 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
