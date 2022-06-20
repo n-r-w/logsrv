@@ -25,9 +25,7 @@ services:
       - .:/logsrv-config
     ports:
       - "8080:8080"
-    restart: unless-stopped
-    env_file:
-      - logsrv.env
+    restart: unless-stopped    
     depends_on:
       - db
     networks:
