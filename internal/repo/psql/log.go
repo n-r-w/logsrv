@@ -14,6 +14,7 @@ import (
 	"github.com/n-r-w/postgres"
 	"github.com/n-r-w/sqlb"
 	"github.com/n-r-w/sqlq"
+	"github.com/n-r-w/tools"
 )
 
 type LogRepo struct {
@@ -49,13 +50,18 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 			return err
 		}
 
-		body, err := sqlb.ToSql(lr.Body, sqlb.Json, sqlb.NoStringE)
-		if err != nil {
-			return err
+		var body interface{}
+		if lr.Body != nil {
+			var err error
+			body, err = sqlb.ToSql(lr.Body, sqlb.Json, sqlb.NoStringE)
+			if err != nil {
+				return err
+			}
 		}
 
-		bnd := sqlb.NewBinder("(:service, :source, :category, :level, :session, :info, :url, :http_type, :json_body)", "InsertLogs")
+		bnd := sqlb.NewBinder("(:log_time, :service, :source, :category, :level, :session, :info, :url, :http_type, :json_body)", "InsertLogs")
 		if err := bnd.BindValues(map[string]interface{}{
+			"log_time":  lr.LogTime,
 			"service":   lr.Service,
 			"source":    lr.Source,
 			"category":  lr.Category,
@@ -77,11 +83,11 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 	}
 
 	sqlText := fmt.Sprintf(
-		"INSERT INTO logs (service, source, category, level, session, info, url, http_type, json_body) VALUES %s RETURNING id", strings.Join(valuesSql, ","))
+		"INSERT INTO logs (log_time, service, source, category, level, session, info, url, http_type, json_body) VALUES %s RETURNING id", strings.Join(valuesSql, ","))
 
 	q, err := sqlq.SelectTx(tx, sqlText)
 	if err != nil {
-		return nerr.New(err, sqlText)
+		return nerr.New(err, tools.SimplifyString(sqlText))
 	}
 	defer q.Close()
 
@@ -117,7 +123,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 	if len(headersSql) > 0 {
 		sqlText = fmt.Sprintf("INSERT INTO http_headers (record_id, header_name, header_value) VALUES %s", strings.Join(headersSql, ","))
 		if err = sqlq.ExecTx(tx, sqlText); err != nil {
-			return nerr.New(err, sqlText)
+			return nerr.New(err, tools.SimplifyString(sqlText))
 		}
 	}
 
@@ -144,7 +150,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 	if len(propsSql) > 0 {
 		sqlText = fmt.Sprintf("INSERT INTO properties (record_id, p_name, p_value) VALUES %s", strings.Join(propsSql, ","))
 		if err = sqlq.ExecTx(tx, sqlText); err != nil {
-			return nerr.New(err, sqlText)
+			return nerr.New(err, tools.SimplifyString(sqlText))
 		}
 	}
 
@@ -270,7 +276,7 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 	}
 
 	sql := fmt.Sprintf(
-		`select id, record_time, service, source, category, level, session, info, url, http_type, json_body,
+		`select id, record_time, log_time, service, source, category, level, session, info, url, http_type, json_body,
 			(ARRAY(
 			SELECT header_name
 			FROM http_headers h1
@@ -296,7 +302,7 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 
 	q, err := sqlq.Select(p.Pool, ctx, sql)
 	if err != nil {
-		return nil, false, nerr.New(err, sql)
+		return nil, false, nerr.New(err, tools.SimplifyString(sql))
 	}
 	defer q.Close()
 
@@ -308,7 +314,8 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 	for q.Next() {
 		lr := entity.LogRecord{
 			ID:          q.UInt64("id"),
-			Time:        q.Time("record_time"),
+			RecordTime:  q.Time("record_time"),
+			LogTime:     q.Time("log_time"),
 			Service:     q.String("service"),
 			Source:      q.String("source"),
 			Category:    q.String("category"),

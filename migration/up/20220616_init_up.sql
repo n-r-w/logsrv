@@ -4,6 +4,7 @@ CREATE TABLE public.logs
 (
     id bigserial NOT NULL,
     record_time timestamp without time zone NOT NULL DEFAULT Now(),
+    log_time timestamp without time zone,
     service text,
     source text,
     category text,
@@ -16,6 +17,7 @@ CREATE TABLE public.logs
     PRIMARY KEY (id)
 );
 
+COMMENT ON COLUMN public.logs.log_time IS 'время отправки записи';
 COMMENT ON COLUMN public.logs.service IS 'какой сервис записал информацию: имя сервиса';
 COMMENT ON COLUMN public.logs.source IS 'откуда пришли данные в рамках сервиса, например: DEMO, STAGE, PROD';
 COMMENT ON COLUMN public.logs.category IS 'произвольная информация для возможности группировки и фильтрации';
@@ -26,6 +28,7 @@ COMMENT ON COLUMN public.logs.http_type IS 'тип HTTP запроса POST, GET
 COMMENT ON COLUMN public.logs.json_body IS 'тело HTTP запроса и т.п.';
 
 CREATE INDEX idx_logs_date ON public.logs (record_time);
+CREATE INDEX idx_logs_log_time ON public.logs (log_time);
 CREATE INDEX idx_logs_service ON public.logs (service);
 CREATE INDEX idx_logs_source ON public.logs (source);
 CREATE INDEX idx_logs_category ON public.logs (category);

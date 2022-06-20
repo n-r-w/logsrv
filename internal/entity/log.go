@@ -8,7 +8,8 @@ import (
 // LogRecord - запись в журнале
 type LogRecord struct {
 	ID          uint64            `json:"id"`
-	Time        time.Time         `json:"time"`
+	RecordTime  time.Time         `json:"recordTime"`
+	LogTime     time.Time         `json:"logTime"`
 	Service     string            `json:"service"`
 	Source      string            `json:"source"`
 	Category    string            `json:"category"`
@@ -24,7 +25,7 @@ type LogRecord struct {
 
 // IsEmpty ...
 func (l *LogRecord) IsEmpty() bool {
-	return l.Time.IsZero()
+	return l.RecordTime.IsZero()
 }
 
 // Validate ...
