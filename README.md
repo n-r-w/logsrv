@@ -15,7 +15,7 @@
     Применить к ней скрипт migration\up\20220616_init_up.sql
     Отредактировать config.toml. По описанию параметров все должно быть понятно.
 ### Запуск    
-    updsrv -config-path ./config.toml    
+    logsrv -config-path ./config.toml    
     
 ### При модификации кода требуется:
     Установка Google Wire
