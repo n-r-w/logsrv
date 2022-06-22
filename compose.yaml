@@ -7,7 +7,7 @@ services:
       - ./pg_log_data:/var/lib/postgresql/data
       - ./migration/up:/docker-entrypoint-initdb.d
     environment:      
-      POSTGRES_DB: kp_logs
+      POSTGRES_DB: logs
       POSTGRES_HOST_AUTH_METHOD: md5
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1      
