@@ -59,18 +59,20 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 			}
 		}
 
-		bnd := sqlb.NewBinder("(:log_time, :service, :source, :category, :level, :session, :info, :url, :http_type, :json_body)", "InsertLogs")
+		bnd := sqlb.NewBinder("(:log_time, :service, :source, :category, :level, :session, :info, :url, :http_type, :http_code, :error_code, :json_body)", "InsertLogs")
 		if err := bnd.BindValues(map[string]interface{}{
-			"log_time":  lr.LogTime,
-			"service":   lr.Service,
-			"source":    lr.Source,
-			"category":  lr.Category,
-			"level":     lr.Level,
-			"session":   lr.Session,
-			"info":      lr.Info,
-			"url":       lr.Url,
-			"http_type": lr.HttpType,
-			"json_body": body}); err != nil {
+			"log_time":   lr.LogTime,
+			"service":    sqlb.VNull(lr.Service),
+			"source":     sqlb.VNull(lr.Source),
+			"category":   sqlb.VNull(lr.Category),
+			"level":      sqlb.VNull(lr.Level),
+			"session":    sqlb.VNull(lr.Session),
+			"info":       sqlb.VNull(lr.Info),
+			"url":        sqlb.VNull(lr.Url),
+			"http_type":  sqlb.VNull(lr.HttpType),
+			"http_code":  sqlb.VNull(lr.HttpCode),
+			"error_code": sqlb.VNull(lr.ErrorCode),
+			"json_body":  body}); err != nil {
 			return err
 		}
 
@@ -83,7 +85,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 	}
 
 	sqlText := fmt.Sprintf(
-		"INSERT INTO logs (log_time, service, source, category, level, session, info, url, http_type, json_body) VALUES %s RETURNING id", strings.Join(valuesSql, ","))
+		"INSERT INTO logs (log_time, service, source, category, level, session, info, url, http_type, http_code, error_code, json_body) VALUES %s RETURNING id", strings.Join(valuesSql, ","))
 
 	q, err := sqlq.SelectTx(tx, sqlText)
 	if err != nil {
@@ -226,6 +228,12 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 		if len(c.HttpType) > 0 {
 			critSql = append(critSql, fmt.Sprintf("l.http_type='%s'", c.HttpType))
 		}
+		if c.HttpCode > 0 {
+			critSql = append(critSql, fmt.Sprintf("l.http_code=%d", c.HttpCode))
+		}
+		if c.ErrorCode > 0 {
+			critSql = append(critSql, fmt.Sprintf("l.error_code=%d", c.ErrorCode))
+		}
 
 		for key, value := range c.BodyValues {
 			v, err := sqlb.ToSql(value, sqlb.JsonPath)
@@ -276,7 +284,7 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 	}
 
 	sql := fmt.Sprintf(
-		`select id, record_time, log_time, service, source, category, level, session, info, url, http_type, json_body,
+		`select id, record_time, log_time, service, source, category, level, session, info, url, http_type, http_code, error_code, json_body,
 			(ARRAY(
 			SELECT header_name
 			FROM http_headers h1
@@ -297,7 +305,7 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 			FROM properties p2
 			WHERE p2.record_id = l.id
 			)) as p_values
-		from logs l where %s`,
+		from logs l where %s order by log_time`,
 		strings.Join(whereSql, opGlobal))
 
 	q, err := sqlq.Select(p.Pool, ctx, sql)
@@ -325,6 +333,8 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 			Properties:  map[string]string{},
 			Url:         q.String("url"),
 			HttpType:    q.String("http_type"),
+			HttpCode:    q.Int("http_code"),
+			ErrorCode:   q.Int("error_code"),
 			HttpHeaders: map[string]string{},
 			Body:        q.Json("json_body"),
 		}

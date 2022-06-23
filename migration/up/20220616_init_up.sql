@@ -13,6 +13,8 @@ CREATE TABLE public.logs
     info text,
     url text,
     http_type text,
+    http_code int,
+    error_code int,
     json_body jsonb,
     PRIMARY KEY (id)
 );
@@ -25,6 +27,8 @@ COMMENT ON COLUMN public.logs.level IS 'информация, ошибка, пр
 COMMENT ON COLUMN public.logs.session IS 'сквозной ID для возможности отслеживания записей в рамках одного запроса';
 COMMENT ON COLUMN public.logs.url IS 'http url';
 COMMENT ON COLUMN public.logs.http_type IS 'тип HTTP запроса POST, GET, PUT, PATCH, DELETE';
+COMMENT ON COLUMN public.logs.http_code IS 'код HTTP ответа';
+COMMENT ON COLUMN public.logs.error_code IS 'код ошибки';
 COMMENT ON COLUMN public.logs.json_body IS 'тело HTTP запроса и т.п.';
 
 CREATE INDEX idx_logs_date ON public.logs (record_time);
@@ -37,6 +41,8 @@ CREATE INDEX idx_logs_session ON public.logs (session);
 CREATE INDEX idx_logs_info ON public.logs (info);
 CREATE INDEX idx_logs_url ON public.logs (url);
 CREATE INDEX idx_logs_http_type ON public.logs (http_type);
+CREATE INDEX idx_logs_http_code ON public.logs (http_code);
+CREATE INDEX idx_logs_error_code ON public.logs (error_code);
 CREATE INDEX idx_logs_json_body ON public.logs (json_body);
 
 CREATE TABLE public.http_headers 

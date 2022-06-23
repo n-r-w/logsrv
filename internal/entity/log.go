@@ -19,6 +19,8 @@ type LogRecord struct {
 	Properties  map[string]string `json:"properties"`
 	Url         string            `json:"url"`
 	HttpType    string            `json:"httpType"`
+	HttpCode    int               `json:"httpCode"`
+	ErrorCode   int               `json:"errorCode"`
 	HttpHeaders map[string]string `json:"httpHeaders"`
 	Body        interface{}       `json:"body"`
 }
