@@ -34,7 +34,7 @@ func (p *LogRepo) Size() int {
 }
 
 func (p *LogRepo) Insert(records []entity.LogRecord) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(p.config.DbWriteTimeout))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(p.config.DbWriteTimeout))
 	defer cancel()
 
 	tx := sqlq.NewTx(p.Pool, ctx)
@@ -160,7 +160,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 }
 
 func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord, limited bool, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(p.config.DbReadTimeout))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(p.config.DbReadTimeout))
 	defer cancel()
 
 	if len(request.Criteria) == 0 {

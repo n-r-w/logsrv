@@ -34,8 +34,8 @@ func Start(cfg *config.Config, logger lg.Logger) {
 	// запускаем http сервер
 	httpServer := httpserver.New(con.Router.Handler(), logger,
 		httpserver.Address(con.Config.Host, con.Config.Port),
-		httpserver.ReadTimeout(time.Second*time.Duration(con.Config.HttpReadTimeout)),
-		httpserver.WriteTimeout(time.Second*time.Duration(con.Config.HttpWriteTimeout)),
+		httpserver.ReadTimeout(time.Millisecond*time.Duration(con.Config.HttpReadTimeout)), // меняет также ReadHeaderTimeout, IdleTimeout
+		httpserver.WriteTimeout(time.Millisecond*time.Duration(con.Config.HttpWriteTimeout)),
 		httpserver.ShutdownTimeout(time.Second*time.Duration(con.Config.HttpShutdownTimeout)),
 	)
 
