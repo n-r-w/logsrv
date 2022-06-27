@@ -2,6 +2,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"time"
 )
 
@@ -22,7 +23,7 @@ type LogRecord struct {
 	HttpCode    int               `json:"httpCode"`
 	ErrorCode   int               `json:"errorCode"`
 	HttpHeaders map[string]string `json:"httpHeaders"`
-	Body        interface{}       `json:"body"`
+	Body        json.RawMessage   `json:"body"`
 }
 
 // IsEmpty ...

@@ -50,15 +50,6 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 			return err
 		}
 
-		var body interface{}
-		if lr.Body != nil {
-			var err error
-			body, err = sqlb.ToSql(lr.Body, sqlb.Json, sqlb.NoStringE)
-			if err != nil {
-				return err
-			}
-		}
-
 		bnd := sqlb.NewBinder("(:log_time, :service, :source, :category, :level, :session, :info, :url, :http_type, :http_code, :error_code, :json_body)", "InsertLogs")
 		if err := bnd.BindValues(map[string]interface{}{
 			"log_time":   lr.LogTime,
@@ -72,7 +63,8 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 			"http_type":  sqlb.VNull(lr.HttpType),
 			"http_code":  sqlb.VNull(lr.HttpCode),
 			"error_code": sqlb.VNull(lr.ErrorCode),
-			"json_body":  body}); err != nil {
+			"json_body":  sqlb.VNull(lr.Body),
+		}); err != nil {
 			return err
 		}
 
@@ -89,6 +81,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 
 	q, err := sqlq.SelectTx(tx, sqlText)
 	if err != nil {
+		fmt.Println(sqlText)
 		return nerr.New(err, tools.SimplifyString(sqlText))
 	}
 	defer q.Close()

@@ -43,7 +43,7 @@ CREATE INDEX idx_logs_url ON public.logs (url);
 CREATE INDEX idx_logs_http_type ON public.logs (http_type);
 CREATE INDEX idx_logs_http_code ON public.logs (http_code);
 CREATE INDEX idx_logs_error_code ON public.logs (error_code);
-CREATE INDEX idx_logs_json_body ON public.logs (json_body);
+-- CREATE INDEX idx_logs_json_body ON public.logs (json_body);
 
 CREATE TABLE public.http_headers 
 (

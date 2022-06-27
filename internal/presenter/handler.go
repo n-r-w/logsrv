@@ -12,7 +12,7 @@ import (
 func (p *Presenter) add() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req []entity.LogRecord
-		// парсим входящий json
+		// парсим входящий json		
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			p.controller.RespondError(w, http.StatusBadRequest, err)
 
