@@ -3,8 +3,8 @@ SET CLIENT_ENCODING TO 'UTF8';
 CREATE TABLE public.logs 
 (
     id bigserial NOT NULL,
-    record_time timestamp without time zone NOT NULL DEFAULT Now(),
-    log_time timestamp without time zone,
+    record_time timestamp with time zone NOT NULL DEFAULT Now(),
+    log_time timestamp with time zone,
     service text,
     source text,
     category text,
