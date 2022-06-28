@@ -25,7 +25,7 @@ func NewContainer(logger lg.Logger, config2 *config.Config, dbUrl postgres.Url, 
 	if err != nil {
 		return nil, nil, err
 	}
-	logRepo := psql.NewLog(postgresPostgres, config2)
+	logRepo := psql.NewLog(postgresPostgres, logger, config2)
 	dispatcher := wdispatch.New(logRepo, logger, config2)
 	wBuf := wbuf.New(logRepo, logger, config2)
 	routerData := httprouter.New(logger)

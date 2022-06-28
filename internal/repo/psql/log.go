@@ -3,11 +3,13 @@ package psql
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/n-r-w/eno"
+	"github.com/n-r-w/lg"
 	"github.com/n-r-w/logsrv/internal/config"
 	"github.com/n-r-w/logsrv/internal/entity"
 	"github.com/n-r-w/nerr"
@@ -18,12 +20,14 @@ import (
 )
 
 type LogRepo struct {
+	logger lg.Logger
 	*postgres.Postgres
 	config *config.Config
 }
 
-func NewLog(pg *postgres.Postgres, config *config.Config) *LogRepo {
+func NewLog(pg *postgres.Postgres, logger lg.Logger, config *config.Config) *LogRepo {
 	return &LogRepo{
+		logger:   logger,
 		Postgres: pg,
 		config:   config,
 	}
@@ -313,6 +317,13 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 	limited = false
 
 	for q.Next() {
+		body := q.Json("json_body")
+		// пробуем его запарсить, иначе это вылезет потом и мы не сможем отправить ответ
+		if _, err := json.Marshal(body); err != nil {
+			body = json.RawMessage(fmt.Sprintf(`{"error": "%s"}`, err.Error()))
+			p.logger.Debug("%s", string(body))
+		}
+
 		lr := entity.LogRecord{
 			ID:          q.UInt64("id"),
 			RecordTime:  q.Time("record_time"),
@@ -329,7 +340,7 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 			HttpCode:    q.Int("http_code"),
 			ErrorCode:   q.Int("error_code"),
 			HttpHeaders: map[string]string{},
-			Body:        q.Json("json_body"),
+			Body:        body,
 		}
 
 		headerNames := q.StringArray("header_names")
