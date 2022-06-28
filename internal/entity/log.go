@@ -10,20 +10,20 @@ import (
 type LogRecord struct {
 	ID          uint64            `json:"id"`
 	RecordTime  time.Time         `json:"recordTime"`
-	LogTime     time.Time         `json:"logTime"`
-	Service     string            `json:"service"`
-	Source      string            `json:"source"`
-	Category    string            `json:"category"`
-	Level       string            `json:"level"`
-	Session     string            `json:"session"`
-	Info        string            `json:"info"`
-	Properties  map[string]string `json:"properties"`
-	Url         string            `json:"url"`
-	HttpType    string            `json:"httpType"`
-	HttpCode    int               `json:"httpCode"`
-	ErrorCode   int               `json:"errorCode"`
-	HttpHeaders map[string]string `json:"httpHeaders"`
-	Body        json.RawMessage   `json:"body"`
+	LogTime     time.Time         `json:"logTime,omitempty"`
+	Service     string            `json:"service,omitempty"`
+	Source      string            `json:"source,omitempty"`
+	Category    string            `json:"category,omitempty"`
+	Level       string            `json:"level,omitempty"`
+	Session     string            `json:"session,omitempty"`
+	Info        string            `json:"info,omitempty"`
+	Properties  map[string]string `json:"properties,omitempty"`
+	Url         string            `json:"url,omitempty"`
+	HttpType    string            `json:"httpType,omitempty"`
+	HttpCode    int               `json:"httpCode,omitempty"`
+	ErrorCode   int               `json:"errorCode,omitempty"`
+	HttpHeaders map[string]string `json:"httpHeaders,omitempty"`
+	Body        json.RawMessage   `json:"body,omitempty"`
 }
 
 // IsEmpty ...

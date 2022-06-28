@@ -3,7 +3,6 @@ package psql
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -317,13 +316,6 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 	limited = false
 
 	for q.Next() {
-		body := q.Json("json_body")
-		// пробуем его запарсить, иначе это вылезет потом и мы не сможем отправить ответ
-		if _, err := json.Marshal(body); err != nil {
-			body = json.RawMessage(fmt.Sprintf(`{"error": "%s"}`, err.Error()))
-			p.logger.Debug("%s", string(body))
-		}
-
 		lr := entity.LogRecord{
 			ID:          q.UInt64("id"),
 			RecordTime:  q.Time("record_time"),
@@ -340,7 +332,7 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 			HttpCode:    q.Int("http_code"),
 			ErrorCode:   q.Int("error_code"),
 			HttpHeaders: map[string]string{},
-			Body:        body,
+			Body:        q.Json("json_body"),
 		}
 
 		headerNames := q.StringArray("header_names")
