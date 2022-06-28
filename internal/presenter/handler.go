@@ -36,7 +36,7 @@ func (p *Presenter) search() http.HandlerFunc {
 		req := entity.SearchRequest{}
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			p.controller.RespondError(w, http.StatusBadRequest, err)
+			p.controller.RespondError(w, http.StatusBadRequest, nerr.New(err))
 
 			return
 		}
