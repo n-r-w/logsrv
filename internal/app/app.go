@@ -14,7 +14,7 @@ import (
 	"github.com/n-r-w/postgres"
 )
 
-const version = "1.0.0"
+const version = "1.0.1"
 
 func Start(cfg *config.Config, logger lg.Logger) {
 	logger.Info("logsrv %s", version)

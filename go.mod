@@ -8,7 +8,7 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/jackc/pgtype v1.11.0
 	github.com/n-r-w/eno v1.0.0
-	github.com/n-r-w/httprouter v1.0.2
+	github.com/n-r-w/httprouter v1.0.4
 	github.com/n-r-w/httpserver v1.0.2
 	github.com/n-r-w/lg v1.0.1
 	github.com/n-r-w/nerr v1.0.2
