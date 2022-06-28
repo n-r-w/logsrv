@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type SearchRequest struct {
 	Criteria []SearchCriteria `json:"criteria"`
@@ -25,5 +28,5 @@ type SearchCriteria struct {
 	ErrorCode   int                    `json:"errorCode"`
 	HttpHeaders map[string]string      `json:"httpHeaders"`
 	BodyValues  map[string]interface{} `json:"bodyValues"`
-	Body        interface{}            `json:"body"`
+	Body        json.RawMessage        `json:"body"`
 }

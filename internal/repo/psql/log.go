@@ -236,7 +236,7 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 			critSql = append(critSql, fmt.Sprintf(`jsonb_path_exists(l.json_body, '$.** ? (@.%s == %s)')`, key, v))
 		}
 
-		if c.Body != nil {
+		if c.Body != nil && len(c.Body) > 0 {
 			s, err := sqlb.ToSql(c.Body, sqlb.Json)
 			if err != nil {
 				return nil, false, err

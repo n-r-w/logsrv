@@ -114,8 +114,8 @@ github.com/n-r-w/httpserver v1.0.2 h1:B+9CtsrkvvjKCBp2HVlX9GYZ7jpN3tLyjM2LqgETra
 github.com/n-r-w/httpserver v1.0.2/go.mod h1:t+wFXuWNAkOfiCJuhGwJ2t5FBJ0/J8xuW9+1eMVMoaA=
 github.com/n-r-w/lg v1.0.1 h1:KBHAIEY5uulsj/1ZbAwLw8IDAVgFIA6Lkqql6RZlxWc=
 github.com/n-r-w/lg v1.0.1/go.mod h1:/yrLc0g9V88Mo0uaSHVrI+gKXZBjyCrBJchgsSQeNVo=
-github.com/n-r-w/nerr v1.0.1 h1:OWrUh8I7b8UGEjNknCpFWV2FGKZCbvZQy08pr4UfnvM=
-github.com/n-r-w/nerr v1.0.1/go.mod h1:hbaOtKi/OrKLYvuuPBAbJQzvtNNeR9fGM8bPLLwTutg=
+github.com/n-r-w/nerr v1.0.2 h1:cUIjCVkafjE5vMfGh7dGSRxt0j3FpF6OKzwBi40ZSqQ=
+github.com/n-r-w/nerr v1.0.2/go.mod h1:hbaOtKi/OrKLYvuuPBAbJQzvtNNeR9fGM8bPLLwTutg=
 github.com/n-r-w/postgres v1.0.2 h1:CvRCd3oVAW5ze7QjcdG8PbbXMvQVTNScYxjM/HRuoFI=
 github.com/n-r-w/postgres v1.0.2/go.mod h1:EEW/Y/ddqRqttaYiyLggVbkpRhEcRl70M7OQupNP7Y0=
 github.com/n-r-w/sqlb v1.0.5 h1:3K6hxoWypeEFhdBexYaVR0KmYp7MqRw2UsV7AdWICek=

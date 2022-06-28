@@ -11,7 +11,7 @@ require (
 	github.com/n-r-w/httprouter v1.0.2
 	github.com/n-r-w/httpserver v1.0.2
 	github.com/n-r-w/lg v1.0.1
-	github.com/n-r-w/nerr v1.0.1
+	github.com/n-r-w/nerr v1.0.2
 	github.com/n-r-w/postgres v1.0.2
 	github.com/n-r-w/sqlb v1.0.5
 	github.com/n-r-w/sqlq v1.0.3
