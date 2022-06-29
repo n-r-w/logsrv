@@ -24,7 +24,8 @@ type Config struct {
 	HttpShutdownTimeout  int      `toml:"HTTP_SHUTDOWN_TIMEOUT"`
 	RateLimit            int      `toml:"RATE_LIMIT"`
 	RateLimitBurst       int      `toml:"RATE_LIMIT_BURST"`
-	Tokens               []string `toml:"TOKENS"`
+	TokensRead           []string `toml:"TOKENS_READ"`
+	TokensWrite          []string `toml:"TOKENS_WRITE"`
 }
 
 const (
@@ -52,7 +53,8 @@ func New(configPath string, logger lg.Logger) (*Config, error) {
 		HttpShutdownTimeout:  10,
 		RateLimit:            10000,
 		RateLimitBurst:       20000,
-		Tokens:               []string{},
+		TokensRead:           []string{},
+		TokensWrite:          []string{},
 	}
 
 	if configPath != "" {

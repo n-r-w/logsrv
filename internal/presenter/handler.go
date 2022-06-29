@@ -12,6 +12,11 @@ import (
 // Добавить в лог
 func (p *Presenter) add() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if err := p.checkRights(r, true); err != nil {
+			p.controller.RespondError(w, http.StatusForbidden, err)
+			return
+		}
+
 		var req []entity.LogRecord
 		// парсим входящий json
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -33,6 +38,11 @@ func (p *Presenter) add() http.HandlerFunc {
 // Получить записи из лога
 func (p *Presenter) search() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if err := p.checkRights(r, false); err != nil {
+			p.controller.RespondError(w, http.StatusForbidden, err)
+			return
+		}
+
 		req := entity.SearchRequest{}
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
