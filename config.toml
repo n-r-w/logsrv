@@ -3,7 +3,7 @@ HOST = "0.0.0.0"
 # порт запуска сервера
 PORT = "8080"
 # строка подключения к БД
-DATABASE_URL = "host=db user=postgres password=1 port=5432 dbname=logs sslmode=disable connect_timeout=15000"
+DATABASE_URL = "host=192.168.1.72 user=postgres password=1 port=5432 dbname=logs sslmode=disable connect_timeout=15000"
 # Максимальное количество сессий БД
 MAX_DB_SESSIONS = 50
 # Время жизни незадействованного соединения к БД в секундах
@@ -12,16 +12,16 @@ MAX_DB_SESSION_IDLE_TIME = 10
 MAX_LOG_RECORDS_RESULT = 1000
 # Таймаут на чтение для HTTP сервера в миллисекундах
 # Время на чтение заголовков и тела входящего запроса
-HTTP_READ_TIMEOUT = 1000
+HTTP_READ_TIMEOUT = 99999999
 # Таймаут на запись для HTTP сервера в миллисекундах
 # Время после окончания чтения заголовков и тела входящего запроса и до окончания ответа
-HTTP_WRITE_TIMEOUT = 10000
+HTTP_WRITE_TIMEOUT = 999999
 # Таймаут на чтение из БД в миллисекундах
 # Должен быть меньше чем HTTP_WRITE_TIMEOUT
-DB_READ_TIMEOUT = 8000
+DB_READ_TIMEOUT = 999999
 # Таймаут на запись в БД в миллисекундах
 # Не связан с таймаутами http, т.к. запись в БД идет асинхронно
-DB_WRITE_TIMEOUT = 5000
+DB_WRITE_TIMEOUT = 999999
 # Таймаут завершения HTTP сервера в секундах
 HTTP_SHUTDOWN_TIMEOUT = 10
 # Максимальное количество запросов в секунду

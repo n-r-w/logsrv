@@ -120,7 +120,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 	}
 	if len(headersSql) > 0 {
 		sqlText = fmt.Sprintf("INSERT INTO http_headers (record_id, header_name, header_value) VALUES %s", strings.Join(headersSql, ","))
-		if err = sqlq.ExecTx(tx, sqlText); err != nil {
+		if _, err = sqlq.ExecTx(tx, sqlText); err != nil {
 			return nerr.New(err, tools.SimplifyString(sqlText))
 		}
 	}
@@ -147,7 +147,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 	}
 	if len(propsSql) > 0 {
 		sqlText = fmt.Sprintf("INSERT INTO properties (record_id, p_name, p_value) VALUES %s", strings.Join(propsSql, ","))
-		if err = sqlq.ExecTx(tx, sqlText); err != nil {
+		if _, err = sqlq.ExecTx(tx, sqlText); err != nil {
 			return nerr.New(err, tools.SimplifyString(sqlText))
 		}
 	}
@@ -201,34 +201,74 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 		}
 
 		if len(c.Service) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.service='%s'", c.Service))
+			if v, err := sqlb.ToSql(c.Service); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.service=%s", v))
+			}
 		}
 		if len(c.Source) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.source='%s'", c.Source))
+			if v, err := sqlb.ToSql(c.Source); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.source=%s", v))
+			}
 		}
 		if len(c.Category) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.category='%s'", c.Category))
+			if v, err := sqlb.ToSql(c.Category); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.category=%s", v))
+			}
 		}
 		if len(c.Level) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.level='%s'", c.Level))
+			if v, err := sqlb.ToSql(c.Level); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.level=%s", v))
+			}
 		}
 		if len(c.Session) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.session='%s'", c.Session))
+			if v, err := sqlb.ToSql(c.Session); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.session=%s", v))
+			}
 		}
 		if len(c.Url) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.url~'%s'", c.Url)) // регулярка
+			if v, err := sqlb.ToSql(c.Url); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.url~%s", v))
+			}
 		}
 		if len(c.Info) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.info~'%s'", c.Info)) // регулярка
+			if v, err := sqlb.ToSql(c.Info); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.info~%s", v))
+			}
 		}
 		if len(c.HttpType) > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.http_type='%s'", c.HttpType))
+			if v, err := sqlb.ToSql(c.HttpType); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.http_type=%s", v))
+			}
 		}
 		if c.HttpCode > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.http_code=%d", c.HttpCode))
+			if v, err := sqlb.ToSql(c.HttpCode); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.http_code=%s", v))
+			}
 		}
 		if c.ErrorCode > 0 {
-			critSql = append(critSql, fmt.Sprintf("l.error_code=%d", c.ErrorCode))
+			if v, err := sqlb.ToSql(c.ErrorCode); err != nil {
+				return nil, false, err
+			} else {
+				critSql = append(critSql, fmt.Sprintf("l.error_code=%s", v))
+			}
 		}
 
 		for key, value := range c.BodyValues {
@@ -253,7 +293,16 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 		if len(c.HttpHeaders) > 0 {
 			var headersSql []string
 			for key, value := range c.HttpHeaders {
-				headersSql = append(headersSql, fmt.Sprintf("(h.header_name = '%s' and h.header_value = '%s')", key, value))
+				sKey, err := sqlb.ToSql(key)
+				if err != nil {
+					return nil, false, err
+				}
+				sValue, err := sqlb.ToSql(value)
+				if err != nil {
+					return nil, false, err
+				}
+
+				headersSql = append(headersSql, fmt.Sprintf("(h.header_name = %s and h.header_value = %s)", sKey, sValue))
 			}
 
 			critSql = append(critSql, fmt.Sprintf("exists(SELECT * FROM http_headers h WHERE h.record_id = l.id AND (%s))",
@@ -263,7 +312,16 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 		if len(c.Properties) > 0 {
 			var propsSql []string
 			for key, value := range c.Properties {
-				propsSql = append(propsSql, fmt.Sprintf("(h.p_name = '%s' and h.p_value = '%s')", key, value))
+				sKey, err := sqlb.ToSql(key)
+				if err != nil {
+					return nil, false, err
+				}
+				sValue, err := sqlb.ToSql(value)
+				if err != nil {
+					return nil, false, err
+				}
+
+				propsSql = append(propsSql, fmt.Sprintf("(h.p_name = %s and h.p_value = %s)", sKey, sValue))
 			}
 
 			critSql = append(critSql, fmt.Sprintf("exists(SELECT * FROM properties h WHERE h.record_id = l.id AND (%s))",
