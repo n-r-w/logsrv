@@ -14,7 +14,7 @@ import (
 	"github.com/n-r-w/postgres"
 )
 
-const version = "1.0.5"
+const version = "1.0.6"
 
 func Start(cfg *config.Config, logger lg.Logger) {
 	logger.Info("logsrv %s", version)
@@ -32,7 +32,7 @@ func Start(cfg *config.Config, logger lg.Logger) {
 	}
 
 	// запуск прослоек буферизации записи в БД
-	con.WDispatch.Start()
+	// con.WDispatch.Start()
 	con.WBuf.Start()
 
 	// запускаем http сервер
@@ -57,7 +57,7 @@ func Start(cfg *config.Config, logger lg.Logger) {
 	// ждем завершения
 	err = httpServer.Shutdown()
 	con.WBuf.Stop()
-	con.WDispatch.Stop()
+	// con.WDispatch.Stop()
 	if err != nil {
 		logger.Error("shutdown error: %v", err)
 	} else {

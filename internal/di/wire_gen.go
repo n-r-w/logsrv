@@ -13,7 +13,6 @@ import (
 	"github.com/n-r-w/logsrv/internal/presenter"
 	"github.com/n-r-w/logsrv/internal/repo/psql"
 	"github.com/n-r-w/logsrv/internal/repo/wbuf"
-	"github.com/n-r-w/logsrv/internal/repo/wdispatch"
 	"github.com/n-r-w/postgres"
 )
 
@@ -26,10 +25,9 @@ func NewContainer(logger lg.Logger, config2 *config.Config, dbUrl postgres.Url, 
 		return nil, nil, err
 	}
 	logRepo := psql.NewLog(postgresPostgres, logger, config2)
-	dispatcher := wdispatch.New(logRepo, logger, config2)
 	wBuf := wbuf.New(logRepo, logger, config2)
 	routerData := httprouter.New(logger)
-	presenterPresenter, err := presenter.New(routerData, logRepo, config2)
+	presenterPresenter, err := presenter.New(routerData, wBuf, config2)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -38,7 +36,6 @@ func NewContainer(logger lg.Logger, config2 *config.Config, dbUrl postgres.Url, 
 		Config:    config2,
 		DB:        postgresPostgres,
 		LogRepo:   logRepo,
-		WDispatch: dispatcher,
 		WBuf:      wBuf,
 		Router:    routerData,
 		Presenter: presenterPresenter,
@@ -54,7 +51,6 @@ type Container struct {
 	Config    *config.Config
 	DB        *postgres.Postgres
 	LogRepo   *psql.LogRepo
-	WDispatch *wdispatch.Dispatcher
 	WBuf      *wbuf.WBuf
 	Router    *httprouter.RouterData
 	Presenter *presenter.Presenter

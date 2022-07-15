@@ -1,10 +1,10 @@
-// Package wbuf - запись в БД путем накопления логов в буфер
+// Package wbuf - группировка запросов в пакеты, чтобы отправлять в БД не по одной записи
 package wbuf
 
 import (
-	"sync"
-	"time"
+	"runtime"
 
+	"github.com/n-r-w/aworker"
 	"github.com/n-r-w/eno"
 	"github.com/n-r-w/lg"
 	"github.com/n-r-w/logsrv/internal/config"
@@ -18,105 +18,56 @@ import (
 type WBufInterface presentation.LogInterface
 
 type WBuf struct {
-	log     lg.Logger
-	dbRepo  WBufInterface
-	records []entity.LogRecord
-	mutex   sync.Mutex
-
-	active   bool
-	info     chan bool
-	quit     chan struct{}
-	quitWait sync.WaitGroup
-
+	log            lg.Logger
+	dbRepo         WBufInterface
+	aw             *aworker.AWorker
 	requestLimiter *rate.Limiter
-	normalSize     int // размер буфера до которого будет идти накопление
-	maxSize        int // критический размер буфера
-
-	logLimiter *rate.Limiter
 }
 
 func New(dbRepo WBufInterface, log lg.Logger, config *config.Config) *WBuf {
-	maxSize := 1000
-	return &WBuf{
+	w := &WBuf{
 		log:            log,
 		dbRepo:         dbRepo,
-		records:        []entity.LogRecord{},
-		mutex:          sync.Mutex{},
-		active:         false,
-		info:           make(chan bool, maxSize),
-		quit:           make(chan struct{}),
-		quitWait:       sync.WaitGroup{},
 		requestLimiter: rate.NewLimiter(rate.Limit(config.RateLimit), config.RateLimitBurst),
-		normalSize:     maxSize / 3,
-		maxSize:        maxSize,
-		logLimiter:     rate.NewLimiter(rate.Limit(1), 1),
 	}
+
+	const packetSize = 100
+
+	wcount := 0
+	if config.MaxDbSessions > runtime.NumCPU() {
+		wcount = runtime.NumCPU()
+	} else {
+		wcount = config.MaxDbSessions
+	}
+	w.aw = aworker.NewAWorker(packetSize*runtime.NumCPU(), packetSize, wcount, w.worker, w.processError)
+	return w
+}
+
+func (w *WBuf) worker(messages []any) error {
+	var records []entity.LogRecord
+
+	for _, message := range messages {
+		if m, ok := message.([]entity.LogRecord); !ok {
+			panic("internal error")
+		} else {
+			records = append(records, m...)
+		}
+	}
+
+	// w.log.Info("%d, %d", len(records), w.BufferSize())
+	return w.dbRepo.Insert(records)
 }
 
 func (w *WBuf) Start() {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-
-	w.active = true
-	w.quitWait.Add(1)
-	go w.worker()
+	w.aw.Start()
 }
 
 func (w *WBuf) Stop() {
-	w.log.Info("wbuffer stoping...")
-	defer w.log.Info("wbuffer stopped OK")
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-
-	if !w.active {
-		return
-	}
-
-	close(w.info)
-	w.quit <- struct{}{}
-	w.quitWait.Wait() // если пойти дальше без этого, то можем получить креш из-за того, что воркер не успеет выйти из горутины
-	close(w.quit)
+	w.aw.Stop()
 }
 
 func (w *WBuf) BufferSize() int {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-	return len(w.records)
-}
-
-func (w *WBuf) worker() {
-	defer w.quitWait.Done()
-	for {
-		select {
-		case ok := <-w.info: // мы приедем сюда при закрытии канала с false, поэтому надо реагировать только на true
-			if ok {
-				// выпиливаем записи из буфера и передаем их на обработку
-				w.mutex.Lock()
-				rcopy := make([]entity.LogRecord, len(w.records))
-				copy(rcopy, w.records)
-				w.records = nil
-				w.mutex.Unlock()
-
-				w.processError(w.processBuffer(rcopy))
-			}
-
-		case <-w.quit:
-			// не лочим мьютекс, т.к. все уже залочено при отправке в канал
-			if len(w.records) > 0 {
-				w.processError(w.processBuffer(w.records))
-				w.records = nil
-			}
-			return
-		}
-	}
-}
-
-func (w *WBuf) processBuffer(records []entity.LogRecord) error {
-	if len(records) == 0 {
-		return nil
-	}
-
-	return w.dbRepo.Insert(records)
+	return w.aw.QueueSize()
 }
 
 func (w *WBuf) processError(err error) {
@@ -137,37 +88,7 @@ func (w *WBuf) Insert(records []entity.LogRecord) error {
 		return nerr.New("wbuf: too many requests", eno.ErrTooManyRequests)
 	}
 
-	if w.logLimiter.Allow() {
-		size := w.BufferSize()
-		if size > w.normalSize {
-			w.log.Warn("buffer size: %d", size)
-		}
-	}
-
-	// увеличиваем время отклика входящих запросов при переполнении буфера
-	for {
-		if w.BufferSize() >= w.maxSize {
-			if w.logLimiter.Allow() {
-				w.log.Warn("wbuf: request slowing down")
-			}
-			time.Sleep(time.Millisecond)
-		} else {
-			break
-		}
-	}
-
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-
-	if !w.active {
-		return nerr.New(eno.ErrNotReady)
-	}
-
-	w.records = append(w.records, records...)
-	if len(w.records) > w.normalSize {
-		w.info <- true
-	}
-
+	w.aw.SendMessage(records)
 	return nil
 }
 

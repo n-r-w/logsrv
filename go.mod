@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/BurntSushi/toml v1.1.0
-	github.com/gammazero/workerpool v1.1.2
 	github.com/google/wire v0.5.0
 	github.com/jackc/pgtype v1.11.0
 	github.com/n-r-w/eno v1.0.2
@@ -21,7 +20,6 @@ require (
 
 require (
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/gammazero/deque v0.1.0 // indirect
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
@@ -37,6 +35,7 @@ require (
 	github.com/jackc/pgx/v4 v4.16.1 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/lib/pq v1.10.6 // indirect
+	github.com/n-r-w/aworker v1.0.7
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/thanhpk/randstr v1.0.4 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
