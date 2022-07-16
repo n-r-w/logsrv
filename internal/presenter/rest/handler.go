@@ -1,4 +1,4 @@
-package presenter
+package rest
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 )
 
 // Добавить в лог
-func (p *Presenter) add() http.HandlerFunc {
+func (p *Service) add() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := p.checkRights(r, true); err != nil {
 			p.controller.RespondError(w, http.StatusForbidden, err)
@@ -36,7 +36,7 @@ func (p *Presenter) add() http.HandlerFunc {
 }
 
 // Получить записи из лога
-func (p *Presenter) search() http.HandlerFunc {
+func (p *Service) search() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := p.checkRights(r, false); err != nil {
 			p.controller.RespondError(w, http.StatusForbidden, err)

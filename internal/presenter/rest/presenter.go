@@ -1,4 +1,4 @@
-package presenter
+package rest
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/n-r-w/nerr"
 )
 
-type Presenter struct {
+type Service struct {
 	controller httprouter.Router
 	logRepo    LogInterface
 	config     *config.Config
@@ -20,8 +20,8 @@ type Presenter struct {
 }
 
 // New Инициализация маршрутов
-func New(router httprouter.Router, logRepo LogInterface, config *config.Config) (*Presenter, error) {
-	p := &Presenter{
+func New(router httprouter.Router, logRepo LogInterface, config *config.Config) (*Service, error) {
+	p := &Service{
 		controller:  router,
 		logRepo:     logRepo,
 		config:      config,
@@ -59,7 +59,7 @@ func New(router httprouter.Router, logRepo LogInterface, config *config.Config) 
 }
 
 // Аутентификация пользователя
-func (p *Presenter) authenticateUser(next http.Handler) http.Handler {
+func (p *Service) authenticateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("X-Authorization")
 		if _, ok := p.tokens[token]; !ok {
@@ -72,7 +72,7 @@ func (p *Presenter) authenticateUser(next http.Handler) http.Handler {
 }
 
 // Проверка прав
-func (p *Presenter) checkRights(r *http.Request, writeAccess bool) error {
+func (p *Service) checkRights(r *http.Request, writeAccess bool) error {
 	token := r.Header.Get("X-Authorization")
 	if writeAccess {
 		if _, ok := p.tokensWrite[token]; !ok {

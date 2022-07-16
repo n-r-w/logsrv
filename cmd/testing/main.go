@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"syscall"
@@ -23,8 +24,8 @@ const (
 )
 
 var (
-	thread_count = 10
-	logLimiter   = rate.NewLimiter(rate.Limit(1), 1)
+	thread_count = runtime.NumCPU()
+	logLimiter   = rate.NewLimiter(rate.Limit(5000), 5000)
 	recordCount  int64
 	timer        = time.Now()
 )

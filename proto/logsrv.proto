@@ -1,0 +1,59 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/n-r-w/logsrv/internal/presenter/grpc/grpc_gen";
+
+package grpc_gen;
+
+service Logsrv {
+    rpc SendLog(SendOptions) returns (Error) {}
+    rpc SearchLog(SearchOptions) returns (SearchLogReply) {}
+}
+
+// Ошибка. Если code равно 0 текст не задан, то ошибки нет
+message Error {
+    int32 code = 1;
+    string text = 2;
+}
+
+// Параметры отправки логов
+message SendOptions {
+    string token = 1;
+    repeated LogRecord records = 2;
+}
+
+// Запись в журнале логов
+message LogRecord {
+    string service = 1;
+    string source = 2;
+    string category = 3;
+    string level = 4;
+    string session = 5;
+    string info = 6;
+    string url = 7;
+    string httpType = 8;
+    map<string, string> http_headers = 9;
+    map<string, string> properties = 10;
+    string body = 11;
+}
+
+// Параметры поиска
+message SearchOptions {
+    string token = 1;
+    bool and = 2;
+    repeated SearchCriteria criteria = 3;
+}
+
+// Один из критериев поиска
+message SearchCriteria {
+    bool and = 1;
+    google.protobuf.Timestamp from = 2;
+    google.protobuf.Timestamp to = 3;
+    LogRecord constraints = 4;
+}
+
+// Результат поиска
+message SearchLogReply {
+    Error error = 1;
+    repeated LogRecord records = 2;
+}

@@ -10,7 +10,7 @@ import (
 	"github.com/n-r-w/httprouter"
 	"github.com/n-r-w/lg"
 	"github.com/n-r-w/logsrv/internal/config"
-	"github.com/n-r-w/logsrv/internal/presenter"
+	"github.com/n-r-w/logsrv/internal/presenter/rest"
 	"github.com/n-r-w/logsrv/internal/repo/psql"
 	"github.com/n-r-w/logsrv/internal/repo/wbuf"
 	"github.com/n-r-w/postgres"
@@ -27,18 +27,18 @@ func NewContainer(logger lg.Logger, config2 *config.Config, dbUrl postgres.Url, 
 	logRepo := psql.NewLog(postgresPostgres, logger, config2)
 	wBuf := wbuf.New(logRepo, logger, config2)
 	routerData := httprouter.New(logger)
-	presenterPresenter, err := presenter.New(routerData, wBuf, config2)
+	service, err := rest.New(routerData, wBuf, config2)
 	if err != nil {
 		return nil, nil, err
 	}
 	container := &Container{
-		Logger:    logger,
-		Config:    config2,
-		DB:        postgresPostgres,
-		LogRepo:   logRepo,
-		WBuf:      wBuf,
-		Router:    routerData,
-		Presenter: presenterPresenter,
+		Logger:  logger,
+		Config:  config2,
+		DB:      postgresPostgres,
+		LogRepo: logRepo,
+		WBuf:    wBuf,
+		Router:  routerData,
+		Rest:    service,
 	}
 	return container, func() {
 	}, nil
@@ -47,11 +47,11 @@ func NewContainer(logger lg.Logger, config2 *config.Config, dbUrl postgres.Url, 
 // wire.go:
 
 type Container struct {
-	Logger    lg.Logger
-	Config    *config.Config
-	DB        *postgres.Postgres
-	LogRepo   *psql.LogRepo
-	WBuf      *wbuf.WBuf
-	Router    *httprouter.RouterData
-	Presenter *presenter.Presenter
+	Logger  lg.Logger
+	Config  *config.Config
+	DB      *postgres.Postgres
+	LogRepo *psql.LogRepo
+	WBuf    *wbuf.WBuf
+	Router  *httprouter.RouterData
+	Rest    *rest.Service
 }

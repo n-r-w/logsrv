@@ -8,7 +8,7 @@ require (
 	github.com/jackc/pgtype v1.11.0
 	github.com/n-r-w/eno v1.0.2
 	github.com/n-r-w/httprouter v1.0.15
-	github.com/n-r-w/httpserver v1.0.3
+	github.com/n-r-w/httpserver v1.0.4
 	github.com/n-r-w/lg v1.0.2
 	github.com/n-r-w/nerr v1.0.8
 	github.com/n-r-w/postgres v1.0.2
@@ -16,6 +16,14 @@ require (
 	github.com/n-r-w/sqlq v1.0.17
 	github.com/n-r-w/tools v1.0.2
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858
+	google.golang.org/grpc v1.48.0
+	google.golang.org/protobuf v1.28.0
+)
+
+require (
+	github.com/golang/protobuf v1.5.2 // indirect
+	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 )
 
 require (

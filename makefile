@@ -3,12 +3,10 @@
 build:	
 	go build -v -o . ./cmd/logsrv.go
 
-rebuild:
-	wire ./internal/di
+rebuild:	
 	go build -a -v -o . ./cmd/logsrv.go
 
-race:
-	wire ./internal/di
+race:	
 	go run -race ./cmd/logsrv.go -config-path ./config.toml
 
 run:	
@@ -17,8 +15,9 @@ run:
 runbuild:
 	./bin/logsrv
 
-codegen:
-	wire ./internal/di
+codegen:	
+	protoc --go_out=./internal/presenter/grpc/generated --go_opt=paths=source_relative --go-grpc_out=./internal/presenter/grpc/generated --go-grpc_opt=paths=source_relative proto/logsrv.proto	
+	wire ./internal/di	
 
 tidy:
 	go mod tidy

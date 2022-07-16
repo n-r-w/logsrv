@@ -11,8 +11,10 @@ import (
 // Config logserver.toml
 type Config struct {
 	SuperAdminID         int
-	Host                 string   `toml:"HOST"`
-	Port                 string   `toml:"PORT"`
+	RestHost             string   `toml:"REST_HOST"`
+	RestPort             string   `toml:"REST_PORT"`
+	GrpcHost             string   `toml:"GRPC_HOST"`
+	GrpcPort             string   `toml:"GRPC_PORT"`
 	DatabaseURL          string   `toml:"DATABASE_URL"`
 	MaxDbSessions        int      `toml:"MAX_DB_SESSIONS"`
 	MaxDbSessionIdleTime int      `toml:"MAX_DB_SESSION_IDLE_TIME"`
@@ -40,8 +42,10 @@ const (
 func New(configPath string, logger lg.Logger) (*Config, error) {
 	c := &Config{
 		SuperAdminID:         superAdminID,
-		Host:                 "0.0.0.0",
-		Port:                 "8080",
+		RestHost:             "0.0.0.0",
+		RestPort:             "8080",
+		GrpcHost:             "0.0.0.0",
+		GrpcPort:             "9000",
 		DatabaseURL:          "",
 		MaxDbSessions:        maxDbSessions,
 		MaxDbSessionIdleTime: maxDbSessionIdleTime,

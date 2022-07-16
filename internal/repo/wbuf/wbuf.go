@@ -9,13 +9,13 @@ import (
 	"github.com/n-r-w/lg"
 	"github.com/n-r-w/logsrv/internal/config"
 	"github.com/n-r-w/logsrv/internal/entity"
-	presentation "github.com/n-r-w/logsrv/internal/presenter"
+	"github.com/n-r-w/logsrv/internal/presenter/rest"
 	"github.com/n-r-w/nerr"
 	"golang.org/x/time/rate"
 )
 
 // WBufInterface - алиас для корректной работы google wire
-type WBufInterface presentation.LogInterface
+type WBufInterface rest.LogInterface
 
 type WBuf struct {
 	log            lg.Logger
