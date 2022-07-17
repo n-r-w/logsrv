@@ -1,5 +1,5 @@
-// Package rest ...
-package rest
+// Package presenter ...
+package presenter
 
 import (
 	"github.com/n-r-w/logsrv/internal/entity"

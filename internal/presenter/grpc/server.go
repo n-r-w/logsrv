@@ -6,25 +6,32 @@ import (
 	"net"
 
 	"github.com/n-r-w/lg"
+	"github.com/n-r-w/logsrv/internal/config"
+	"github.com/n-r-w/logsrv/internal/presenter"
 	grpc_gen "github.com/n-r-w/logsrv/internal/presenter/grpc/generated/proto"
 	"github.com/n-r-w/nerr"
 	"google.golang.org/grpc"
 )
 
-type GrpcServer struct {
+type Service struct {
 	grpc_gen.UnimplementedLogsrvServer
 
-	logger lg.Logger
-	srv    *grpc.Server
-	notify chan error
+	cfg       *config.Config
+	logger    lg.Logger
+	logRepo   presenter.LogInterface
+	presenter *presenter.Service
+	srv       *grpc.Server
+	notify    chan error
 }
 
-func NewGrpcServer(logger lg.Logger, host, port string) *GrpcServer {
-
-	s := &GrpcServer{
-		logger: logger,
-		srv:    grpc.NewServer(),
-		notify: make(chan error, 1),
+func New(logger lg.Logger, logRepo presenter.LogInterface, cfg *config.Config, presenter *presenter.Service, host, port string) *Service {
+	s := &Service{
+		cfg:       cfg,
+		logger:    logger,
+		logRepo:   logRepo,
+		presenter: presenter,
+		srv:       grpc.NewServer(),
+		notify:    make(chan error, 1),
 	}
 
 	s.srv = grpc.NewServer()
@@ -35,11 +42,11 @@ func NewGrpcServer(logger lg.Logger, host, port string) *GrpcServer {
 	return s
 }
 
-func (s *GrpcServer) Notify() <-chan error {
+func (s *Service) Notify() <-chan error {
 	return s.notify
 }
 
-func (s *GrpcServer) start(host, port string) {
+func (s *Service) start(host, port string) {
 	addr := fmt.Sprintf("%s:%s", host, port)
 
 	lis, err := net.Listen("tcp", addr)
@@ -54,6 +61,6 @@ func (s *GrpcServer) start(host, port string) {
 	close(s.notify)
 }
 
-func (s *GrpcServer) Shutdown() {
+func (s *Service) Shutdown() {
 	s.srv.GracefulStop()
 }

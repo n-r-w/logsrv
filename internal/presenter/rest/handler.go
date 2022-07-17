@@ -12,7 +12,7 @@ import (
 // Добавить в лог
 func (p *Service) add() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := p.checkRights(r, true); err != nil {
+		if err := p.presenter.CheckRights(r.Header.Get("X-Authorization"), true, false); err != nil {
 			p.controller.RespondError(w, http.StatusForbidden, err)
 			return
 		}
@@ -26,7 +26,7 @@ func (p *Service) add() http.HandlerFunc {
 		}
 
 		if err := p.logRepo.Insert(req); err != nil {
-			p.controller.RespondError(w, http.StatusForbidden, err)
+			p.controller.RespondError(w, http.StatusForbidden, nerr.New(err))
 
 			return
 		}
@@ -38,8 +38,8 @@ func (p *Service) add() http.HandlerFunc {
 // Получить записи из лога
 func (p *Service) search() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := p.checkRights(r, false); err != nil {
-			p.controller.RespondError(w, http.StatusForbidden, err)
+		if err := p.presenter.CheckRights(r.Header.Get("X-Authorization"), false, true); err != nil {
+			p.controller.RespondError(w, http.StatusForbidden, nerr.New(err))
 			return
 		}
 
@@ -53,7 +53,7 @@ func (p *Service) search() http.HandlerFunc {
 
 		records, _, err := p.logRepo.Find(req)
 		if err != nil {
-			p.controller.RespondError(w, http.StatusInternalServerError, err)
+			p.controller.RespondError(w, http.StatusInternalServerError, nerr.New(err))
 
 			return
 		}

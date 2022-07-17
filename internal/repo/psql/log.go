@@ -18,25 +18,25 @@ import (
 	"github.com/n-r-w/tools"
 )
 
-type LogRepo struct {
+type Service struct {
 	logger lg.Logger
-	*postgres.Postgres
+	*postgres.Service
 	config *config.Config
 }
 
-func NewLog(pg *postgres.Postgres, logger lg.Logger, config *config.Config) *LogRepo {
-	return &LogRepo{
-		logger:   logger,
-		Postgres: pg,
-		config:   config,
+func New(pg *postgres.Service, logger lg.Logger, config *config.Config) *Service {
+	return &Service{
+		logger:  logger,
+		Service: pg,
+		config:  config,
 	}
 }
 
-func (p *LogRepo) Size() int {
+func (p *Service) Size() int {
 	return int(p.Pool.Stat().TotalConns())
 }
 
-func (p *LogRepo) Insert(records []entity.LogRecord) error {
+func (p *Service) Insert(records []entity.LogRecord) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(p.config.DbWriteTimeout))
 	defer cancel()
 
@@ -155,7 +155,7 @@ func (p *LogRepo) Insert(records []entity.LogRecord) error {
 	return tx.Commit()
 }
 
-func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord, limited bool, err error) {
+func (p *Service) Find(request entity.SearchRequest) (records []entity.LogRecord, limited bool, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(p.config.DbReadTimeout))
 	defer cancel()
 
@@ -272,15 +272,15 @@ func (p *LogRepo) Find(request entity.SearchRequest) (records []entity.LogRecord
 		}
 
 		for key, value := range c.BodyValues {
-			v, err := sqlb.ToSql(value, sqlb.JsonPath)
+			v, err := sqlb.ToJsonPath(value)
 			if err != nil {
 				return nil, false, err
 			}
-			critSql = append(critSql, fmt.Sprintf(`jsonb_path_exists(l.json_body, '$.** ? (@.%s == %s)')`, key, v))
+			critSql = append(critSql, fmt.Sprintf(`jsonb_path_exists(l.json_body, E'$.** ? (@."%s" == %s)')`, key, v))
 		}
 
 		if c.Body != nil && len(c.Body) > 0 {
-			s, err := sqlb.ToSql(c.Body, sqlb.Json)
+			s, err := sqlb.ToSql(c.Body)
 			if err != nil {
 				return nil, false, err
 			}

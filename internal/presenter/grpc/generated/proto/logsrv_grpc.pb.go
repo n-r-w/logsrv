@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LogsrvClient interface {
-	SendLog(ctx context.Context, in *SendOptions, opts ...grpc.CallOption) (*Error, error)
+	SendLog(ctx context.Context, in *SendOptions, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SearchLog(ctx context.Context, in *SearchOptions, opts ...grpc.CallOption) (*SearchLogReply, error)
 }
 
@@ -34,8 +35,8 @@ func NewLogsrvClient(cc grpc.ClientConnInterface) LogsrvClient {
 	return &logsrvClient{cc}
 }
 
-func (c *logsrvClient) SendLog(ctx context.Context, in *SendOptions, opts ...grpc.CallOption) (*Error, error) {
-	out := new(Error)
+func (c *logsrvClient) SendLog(ctx context.Context, in *SendOptions, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/grpc_gen.Logsrv/SendLog", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (c *logsrvClient) SearchLog(ctx context.Context, in *SearchOptions, opts ..
 // All implementations must embed UnimplementedLogsrvServer
 // for forward compatibility
 type LogsrvServer interface {
-	SendLog(context.Context, *SendOptions) (*Error, error)
+	SendLog(context.Context, *SendOptions) (*emptypb.Empty, error)
 	SearchLog(context.Context, *SearchOptions) (*SearchLogReply, error)
 	mustEmbedUnimplementedLogsrvServer()
 }
@@ -65,7 +66,7 @@ type LogsrvServer interface {
 type UnimplementedLogsrvServer struct {
 }
 
-func (UnimplementedLogsrvServer) SendLog(context.Context, *SendOptions) (*Error, error) {
+func (UnimplementedLogsrvServer) SendLog(context.Context, *SendOptions) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendLog not implemented")
 }
 func (UnimplementedLogsrvServer) SearchLog(context.Context, *SearchOptions) (*SearchLogReply, error) {

@@ -45,7 +45,7 @@ func Start(cfg *config.Config, logger lg.Logger) {
 	)
 
 	// запускаем grpc сервер
-	grpcServer := grpcsrv.NewGrpcServer(logger, con.Config.GrpcHost, con.Config.GrpcPort)
+	grpcServer := grpcsrv.New(logger, con.LogRepo, con.Config, con.Presenter, con.Config.GrpcHost, con.Config.GrpcPort)
 
 	// ждем сигнал от сервера или нажатия ctrl+c
 	interrupt := make(chan os.Signal, 1)
