@@ -71,11 +71,5 @@ func New(configPath string, logger lg.Logger) (*Config, error) {
 		return nil, fmt.Errorf("DATABASE_URL undefined")
 	}
 
-	logger.Info("MAX_DB_SESSIONS: %d", c.MaxDbSessions)
-	logger.Info("MAX_DB_SESSION_IDLE_TIME: %d", c.MaxDbSessionIdleTime)
-	logger.Info("RATE_LIMIT: %d", c.RateLimit)
-	logger.Info("RATE_LIMIT_BURST: %d", c.RateLimitBurst)
-	logger.Info("DATABASE_URL: %s", c.DatabaseURL)
-
 	return c, nil
 }
